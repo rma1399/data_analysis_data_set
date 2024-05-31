@@ -18,10 +18,9 @@ data = pd.read_sql_query(query, conn)
 conn.close()
 
 result = data.groupby('product_name').agg({'price': 'mean', 'quantity': 'sum'}).reset_index()
-
 result.columns = ['product_name', 'avg_price', 'total_quantity']
 
-x = result.drop(columns='product_name')
+x = result.drop(columns=['product_name'])
 y = result['product_name']
 
 label = LabelEncoder()
@@ -30,14 +29,14 @@ y = label.fit_transform(y)
 x_train,x_test,y_train,y_test = train_test_split(x,y,test_size=0.4)
 
 model = tf.keras.models.Sequential()
-model.add(tf.keras.layers.Dense(32,input_dim=x_train.shape[1], activation='sigmoid'))
-model.add(tf.keras.layers.Dense(1,activation='sigmoid'))
+model.add(tf.keras.layers.Dense(32,input_dim=x_train.shape[1], activation='relu'))
+model.add(tf.keras.layers.Dense(len(label.classes_), activation='softmax'))
 
-model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
-model.fit(x_train,y_train,epochs=200)
+model.fit(x_train, y_train, epochs=750)
 
-
+model.evaluate(x_test,y_test)
 
 
 
